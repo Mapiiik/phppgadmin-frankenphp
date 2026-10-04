@@ -60,6 +60,12 @@ ADD https://github.com/ReimuHakurei/phpPgAdmin.git#${PHPPGADMIN_REF} /app/public
 RUN cp /app/public/conf/config.inc.php-dist /app/public/conf/config.inc.php
 
 ############################
+# Caddy configuration
+############################
+# Shared by all our Caddy servers: PROXY protocol always on, LISTENER_MODE direct or behind-proxy
+COPY caddy/ /etc/frankenphp/
+
+############################
 # Non-root runtime
 ############################
 RUN \
