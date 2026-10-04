@@ -1,0 +1,42 @@
+<?php
+/**
+ * phpPgAdmin configuration, copy to config.inc.php in DATA_DIR (default ./data).
+ * It replaces conf/config.inc.php in the image, all defaults are in
+ * conf/config.inc.php-dist of the fork.
+ */
+
+/* Predefined servers, users log in with their own database account */
+$i = 0;
+
+$conf['servers'][$i]['desc'] = 'PostgreSQL';
+$conf['servers'][$i]['host'] = 'db.example.com';
+$conf['servers'][$i]['port'] = 5432;
+$conf['servers'][$i]['sslmode'] = 'prefer';
+$conf['servers'][$i]['defaultdb'] = 'postgres';
+$conf['servers'][$i]['pg_dump_path'] = '/usr/bin/pg_dump';
+$conf['servers'][$i]['pg_dumpall_path'] = '/usr/bin/pg_dumpall';
+$i++;
+
+/* Login: refuse superuser names and empty passwords */
+$conf['extra_login_security'] = true;
+$conf['extra_session_security'] = true;
+
+$conf['default_lang'] = 'auto';
+$conf['autocomplete'] = 'default on';
+$conf['owned_only'] = false;
+$conf['show_comments'] = true;
+$conf['show_advanced'] = false;
+$conf['show_system'] = false;
+$conf['min_password_length'] = 1;
+$conf['left_width'] = 200;
+$conf['theme'] = 'default';
+$conf['show_oids'] = false;
+$conf['max_rows'] = 30;
+$conf['max_chars'] = 50;
+$conf['use_xhtml_strict'] = false;
+$conf['help_base'] = 'http://www.postgresql.org/docs/%s/interactive/';
+$conf['ajax_refresh'] = 3;
+$conf['plugins'] = array();
+
+/* Must match the version in conf/config.inc.php-dist of the fork */
+$conf['version'] = 19;

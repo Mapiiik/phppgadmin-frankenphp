@@ -1,0 +1,72 @@
+# syntax=docker/dockerfile:1
+
+FROM dunglas/frankenphp:php8.4-alpine
+
+# Commit (or branch) of the maintained phpPgAdmin fork, CI passes the exact commit
+ARG PHPPGADMIN_REF=master
+ARG buildno
+ARG gitcommithash
+
+ARG APPLICATION_USER=application
+
+LABEL application="phpPgAdmin"
+LABEL version="${PHPPGADMIN_REF}"
+LABEL maintainer="github.com/Mapiiik"
+
+RUN echo "Build number: $buildno"
+RUN echo "Based on commit: $gitcommithash"
+
+############################
+# System dependencies
+############################
+# pg_dump must be at least as new as the server it dumps
+RUN apk add --no-cache \
+    postgresql18-client
+
+############################
+# PHP extensions
+############################
+RUN install-php-extensions \
+    pgsql \
+    mbstring \
+    opcache
+
+############################
+# PHP configuration
+############################
+# Use production defaults
+RUN cp $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
+
+# Memory limit
+RUN echo "memory_limit = 512M" > $PHP_INI_DIR/conf.d/99-memory.ini
+
+# Upload limits
+RUN echo "upload_max_filesize = 512M" > $PHP_INI_DIR/conf.d/99-upload.ini \
+ && echo "post_max_size = 512M" >> $PHP_INI_DIR/conf.d/99-upload.ini
+
+# Execution time
+RUN echo "max_execution_time = 300" > $PHP_INI_DIR/conf.d/99-timeouts.ini
+
+# Timezone
+RUN echo "date.timezone = UTC" > $PHP_INI_DIR/conf.d/99-timezone.ini
+
+############################
+# Install phpPgAdmin
+############################
+# There is no official image. ADD leaves the .git directory out, so it is never served.
+ADD https://github.com/ReimuHakurei/phpPgAdmin.git#${PHPPGADMIN_REF} /app/public
+
+# Default configuration, replaced by mounting your own conf/config.inc.php
+RUN cp /app/public/conf/config.inc.php-dist /app/public/conf/config.inc.php
+
+############################
+# Non-root runtime
+############################
+RUN \
+    adduser -D ${APPLICATION_USER}; \
+    # Add additional capability to bind to port 80 and 443
+    setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp; \
+    # Give write access to /config/caddy and /data/caddy
+    chown -R ${APPLICATION_USER}:${APPLICATION_USER} /config/caddy /data/caddy
+
+USER ${APPLICATION_USER}

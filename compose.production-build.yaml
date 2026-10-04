@@ -1,0 +1,25 @@
+services:
+  phppgadmin-web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.production
+      args:
+        - PHPPGADMIN_REF
+        - buildno
+        - gitcommithash
+    image: phppgadmin-frankenphp:local
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-localhost}
+    volumes:
+      - ${DATA_DIR:-./data}/config.inc.php:/app/public/conf/config.inc.php:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+
+volumes:
+  caddy_data:
+  caddy_config:
