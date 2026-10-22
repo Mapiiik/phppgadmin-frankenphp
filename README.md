@@ -62,7 +62,9 @@ docker compose up -d
 ## ⚙️ Configuration
 - `SERVER_NAME` (automatic ACME certificates; otherwise self-signed HTTPS)
 - `LISTENER_MODE` (`direct` by default; `behind-proxy` behind an SNI proxy such as HAProxy, which owns
-  port 80, so certificates come by the TLS-ALPN challenge)
+  port 80, so certificates come by the TLS-ALPN challenge; `internal` only on an internal network: Caddy
+  issues the certificate from its own CA and `SERVER_NAME` can be the server's IP address. Browsers warn
+  until they trust its root certificate, `/data/caddy/pki/authorities/local/root.crt` in the container)
 - `PROXY_ALLOW` (where the PROXY protocol header is trusted from: the proxy's network; by default
   only this machine. The header is optional, so it works with or without a proxy)
 - `DATA_DIR` (default `./data`) holds `config.inc.php`, which replaces `conf/config.inc.php`.
